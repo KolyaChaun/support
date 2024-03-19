@@ -10,6 +10,7 @@ flake8 = "*"
 isort = "*"
 black = "*"
 ruff = "*"
+httpx = "*"
 
 [dev-packages]
 
