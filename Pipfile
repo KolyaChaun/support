@@ -6,13 +6,14 @@ name = "pypi"
 [packages]
 django = "==4.2.11"
 requests = ">2.0.0"
-flake8 = "*"
+httpx = "*"
+
+
+[dev-packages]
 isort = "*"
 black = "*"
 ruff = "*"
-httpx = "*"
-
-[dev-packages]
+django-stubs = "~=4.2.7"
 
 [requires]
 python_version = "3.12"
