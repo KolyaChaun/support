@@ -7,7 +7,9 @@ name = "pypi"
 django = "==4.2.11"
 requests = ">2.0.0"
 httpx = "*"
-
+djangorestframework = "~=3.15.0"
+psycopg = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 isort = "*"
