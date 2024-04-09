@@ -8,6 +8,7 @@ django = "==4.2.11"
 requests = ">2.0.0"
 httpx = "*"
 djangorestframework = "~=3.15.0"
+djangorestframework-simplejwt = {version = "~=5.3.1", extra = ["crypto"]}
 psycopg = "*"
 psycopg2-binary = "*"
 
