@@ -1,45 +1,40 @@
-import json
-
-from django.http import HttpRequest, JsonResponse
+from rest_framework import generics, serializers
 
 from issues.models import Issue
+from users.enums import Role
+
+from .enums import Status
 
 
-def create_new_issue(request: HttpRequest) -> JsonResponse:
-    if request.method != "POST":
-        raise Exception("Only POST method for function 'create_new_issue' ")
+class IssueSerializer(serializers.ModelSerializer):
+    status = serializers.IntegerField(required=False)
+    junior = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
-    data = json.loads(request.body)
-    issue = Issue.objects.create(
-        junior_id=data.get("junior_id"),
-        senior_id=data.get("senior_id"),
-        title=data.get("title"),
-        body=data.get("body"),
-    )
-    result = {
-        "id": issue.id,
-        "title": issue.title,
-        "body": issue.body,
-        "senior_id": issue.senior_id,
-        "junior_id": issue.junior_id,
-    }
-    return JsonResponse(data=result)
+    class Meta:
+        model = Issue
+        fields = "__all__"
+
+    def validate(self, attrs):
+        attrs["status"] = Status.OPENED
+        return attrs
 
 
-def get_issue(request: HttpRequest) -> JsonResponse:
-    if request.method != "GET":
-        raise Exception("Only GET method for function 'get_issue' ")
+class IssuesAPI(generics.ListCreateAPIView):
+    http_method_names = ["get", "post"]
+    serializer_class = IssueSerializer
 
-    issues: list[Issue] = Issue.objects.all()
+    def get_queryset(self):
+        return Issue.objects.all()
 
-    results: list[dict] = [
-        {
-            "id": issue.id,
-            "title": issue.title,
-            "body": issue.body,
-            "senior_id": issue.senior_id,
-            "junior_id": issue.junior_id,
-        }
-        for issue in issues
-    ]
-    return JsonResponse(data={"results": results})
+    def post(self, request):
+        if request.user.role == Role.SENIOR:
+            raise Exception("The role is Senior")
+
+        return super().post(request)
+
+
+class IssuesRetrieveUpdateDeleteAPI(generics.RetrieveUpdateDestroyAPIView):
+    http_method_names = ["get", "put", "patch", "delete"]
+    serializer_class = IssueSerializer
+    queryset = Issue.objects.all()
+    lookup_url_kwarg = "id"
