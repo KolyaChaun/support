@@ -1,10 +1,15 @@
-from rest_framework import generics, serializers, status
+from rest_framework import generics, permissions, serializers, status
 from rest_framework.response import Response
 
 from issues.models import Issue
 from users.enums import Role
 
 from .enums import Status
+
+
+class IsAdminOrSeniorUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role in [Role.ADMIN, Role.SENIOR]
 
 
 class IssueSerializer(serializers.ModelSerializer):
@@ -45,31 +50,20 @@ class IssuesRetrieveUpdateDeleteAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Issue.objects.all()
     lookup_url_kwarg = "id"
 
-    def destroy(self, request, *args, **kwargs):
-        if self.request.user.role == Role.ADMIN:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_permissions(self):
+        if self.request.method == "PUT":
+            return [IsAdminOrSeniorUser()]
+        elif self.request.method in "DELETE":
+            return [permissions.IsAdminUser()]
         else:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN, data={"Only admin can delete issues"}
-            )
+            return [permissions.IsAuthenticated()]
+
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        if (
-            self.request.user.role == Role.ADMIN
-            or self.request.user.role == Role.SENIOR
-        ):
-            partial = kwargs.pop("partial", False)
-            instance = self.get_object()
-            serializer = self.get_serializer(
-                instance, data=request.data, partial=partial
-            )
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN,
-                data={"Only admin and senior can update issues"},
-            )
+        if self.request.user == Role.JUNIOR:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return super().update(request, *args, **kwargs)

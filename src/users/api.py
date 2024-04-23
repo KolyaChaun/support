@@ -70,10 +70,10 @@ class UserCreateAPI(generics.CreateAPIView):
         )
 
 
-class UserUpdateAPI(generics.RetrieveUpdateDestroyAPIView):
-    http_method_names = ["get", "put", "delete"]
+class UserRetrieveUpdateAPI(generics.RetrieveUpdateDestroyAPIView):
+    http_method_names = ["get", "put"]
     serializer_class = UserUpdateSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     lookup_url_kwarg = "id"
 
     def get_queryset(self):
@@ -85,12 +85,17 @@ class UserUpdateAPI(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "PUT":
             return UserUpdateSerializer
 
+
+class UserDestroyAPI(generics.DestroyAPIView):
+    http_method_names = ["delete"]
+    permission_classes = [permissions.IsAdminUser]
+    lookup_url_kwarg = "id"
+
+    def get_queryset(self):
+        return User.objects.all()
+
     def destroy(self, request, *args, **kwargs):
-        if self.request.user.role == Role.ADMIN:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN, data={"Only admin can delete user"}
-            )
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        return super().destroy(request, *args, **kwargs)
