@@ -1,11 +1,11 @@
-from django.contrib import admin # noqa
-from django.urls import path # noqa
-from rest_framework_simplejwt.views import TokenObtainPairView # noqa
+from django.contrib import admin 
+from django.urls import path 
+from rest_framework_simplejwt.views import TokenObtainPairView  
 
-from issues.api import IssuesRetrieveUpdateDeleteAPI  # noqa
-from issues.api import (IssuesAPI, issues_close, issues_take, # noqa
-                        messages_api_dispatcher)
-from users.api import (UserCreateAPI, UserDestroyAPI,  # noqa
+from issues.api import IssuesRetrieveUpdateDeleteAPI 
+from issues.api import issues_take 
+from issues.api import IssuesAPI, issues_close, messages_api_dispatcher
+from users.api import (UserCreateAPI, UserDestroyAPI,  
                        UserRetrieveUpdateAPI)
 
 urlpatterns = [
