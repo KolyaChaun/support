@@ -1,9 +1,10 @@
-from django.contrib import admin
-from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib import admin # noqa
+from django.urls import path # noqa
+from rest_framework_simplejwt.views import TokenObtainPairView # noqa
 
-from issues.api import (IssuesAPI, IssuesRetrieveUpdateDeleteAPI,  # noqa
-                        issues_close, issues_take, messages_api_dispatcher)
+from issues.api import IssuesRetrieveUpdateDeleteAPI  # noqa
+from issues.api import (IssuesAPI, issues_close, issues_take, # noqa
+                        messages_api_dispatcher)
 from users.api import (UserCreateAPI, UserDestroyAPI,  # noqa
                        UserRetrieveUpdateAPI)
 
