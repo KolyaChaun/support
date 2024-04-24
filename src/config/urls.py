@@ -1,12 +1,10 @@
-from django.contrib import admin 
-from django.urls import path 
-from rest_framework_simplejwt.views import TokenObtainPairView  
+from django.contrib import admin
+from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from issues.api import IssuesRetrieveUpdateDeleteAPI 
-from issues.api import issues_take 
-from issues.api import IssuesAPI, issues_close, messages_api_dispatcher
-from users.api import (UserCreateAPI, UserDestroyAPI,  
-                       UserRetrieveUpdateAPI)
+from issues.api import (IssuesAPI, IssuesRetrieveUpdateDeleteAPI, issues_close,
+                        issues_take, messages_api_dispatcher)
+from users.api import UserCreateAPI, UserDestroyAPI, UserRetrieveUpdateAPI
 
 urlpatterns = [
     path("admin/", admin.site.urls),
