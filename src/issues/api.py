@@ -1,11 +1,10 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from issues.models import Issue, Message
 from rest_framework import generics, permissions, response, serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
-
-from issues.models import Issue, Message
 from users.enums import Role
 
 from .enums import Status
@@ -116,7 +115,9 @@ def messages_api_dispatcher(request: Request, issue_id: int):
     else:
         issue = Issue.objects.get(id=issue_id)
         payload = request.data | {"issue": issue.id}
-        serializer = MessageSerializer(data=payload, context={"request": request})
+        serializer = MessageSerializer(
+            data=payload, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

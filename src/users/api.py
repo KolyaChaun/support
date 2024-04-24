@@ -3,7 +3,6 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import generics, permissions, serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-
 from users.enums import Role
 
 User = get_user_model()
@@ -44,8 +43,12 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = ["id", "first_name", "last_name"]
 
     def update(self, instance, validated_data):
-        instance.first_name = validated_data.get("first_name", instance.first_name)
-        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.first_name = validated_data.get(
+            "first_name", instance.first_name
+        )
+        instance.last_name = validated_data.get(
+            "last_name", instance.last_name
+        )
         instance.save()
         return instance
 
