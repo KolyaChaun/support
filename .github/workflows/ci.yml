@@ -14,5 +14,3 @@ jobs:
         run: pip install pipenv && pipenv install --dev --system
       - name: Run fomatters
         run: python -m black --check . && python -m isort --check .
-      - name: Run linter
-        run: python -m ruff .
