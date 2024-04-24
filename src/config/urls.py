@@ -2,8 +2,13 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from issues.api import (IssuesAPI, IssuesRetrieveUpdateDeleteAPI, issues_close,
-                        issues_take, messages_api_dispatcher)
+from issues.api import (
+    IssuesAPI,
+    IssuesRetrieveUpdateDeleteAPI,
+    issues_close,
+    issues_take,
+    messages_api_dispatcher,
+)
 from users.api import UserCreateAPI, UserDestroyAPI, UserRetrieveUpdateAPI
 
 urlpatterns = [
