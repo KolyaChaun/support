@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
-
 from users.enums import Role
 
 from .managers import UserManager

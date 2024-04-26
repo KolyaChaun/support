@@ -6,7 +6,14 @@ User = get_user_model()
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["id", "first_name", "last_name", "role", "is_active", "date_joined"]
+    list_display = [
+        "id",
+        "first_name",
+        "last_name",
+        "role",
+        "is_active",
+        "date_joined",
+    ]
     exclude = ["user_permissions", "groups"]
     readonly_fields = [
         "password",

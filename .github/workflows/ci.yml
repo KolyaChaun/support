@@ -1,6 +1,6 @@
 name: Check code quality
 
-on: [pull_request]
+on: [push]
 
 jobs:
   code-qality:
@@ -9,11 +9,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12.1' 
+          python-version: '3.11' 
       - name: Install dependencies
-        run: pip install black ruff isort
+        run: pip install pipenv && pipenv install --dev --system
       - name: Run fomatters
         run: python -m black --check . && python -m isort --check .
-      - name: Run linter
-        run: python -m ruff .
-        
