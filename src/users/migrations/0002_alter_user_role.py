@@ -1,9 +1,5 @@
-from django.db import migrations, models 
-
-import users.enums 
-
-
-
+from django.db import migrations, models
+from users.enums import Role
 
 class Migration(migrations.Migration):
 
@@ -21,7 +17,7 @@ class Migration(migrations.Migration):
                     ("senior", "Senior"),
                     ("junior", "Junior"),
                 ],
-                default=users.enums.Role["JUNIOR"],
+                default=Role.JUNIOR.value,  # Accessing enum value
                 max_length=15,
             ),
         ),
