@@ -1,0 +1,6 @@
+.github/
+.ruff_cache/
+docker-compose.yaml
+Dockerfile
+README.md
+__pycache__/

@@ -8,9 +8,10 @@ django = "==4.2.11"
 requests = ">2.0.0"
 httpx = "*"
 djangorestframework = "~=3.15.0"
-djangorestframework-simplejwt = {version = "~=5.3.1", extra = ["crypto"]}
+djangorestframework-simplejwt = {version = "~=5.3.1", extras = ["crypto"]}
 psycopg = "*"
 psycopg2-binary = "*"
+celery = { version = "==5.4.0", extras = ["redis"] }
 
 [dev-packages]
 isort = "*"
