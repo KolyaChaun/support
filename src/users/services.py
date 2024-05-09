@@ -35,12 +35,4 @@ class Activator:
         )
         activation_key.save()
 
-    def validate_activation(self, activation_key: uuid.UUID) -> None:
-        activation_keys = ActivationKey.objects.filter(key=activation_key)
-        if activation_keys.exists():
-            activation_key_instance = activation_keys.first()
-            user = activation_key_instance.user
-            user.is_active = True
-            user.save()
-            return user
-        return None
+
