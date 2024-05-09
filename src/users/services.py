@@ -34,5 +34,3 @@ class Activator:
             user=user, activation_key=activation_key
         )
         activation_key.save()
-
-
