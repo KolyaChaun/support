@@ -1,9 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from users.enums import Role
+from users.models import ActivationKey
+from users.tasks import send_confirmation_mail
+
+from .services import Activator
 
 User = get_user_model()
 
@@ -66,6 +72,16 @@ class UserCreateAPI(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
+        activator_service = Activator(email=serializer.data["email"])
+        activation_key = activator_service.create_activation_key()
+        activator_service.save_activation_information(
+            internal_user_id=serializer.instance.id,
+            activation_key=activation_key,
+        )
+        activator_service.send_user_activation_email(
+            activation_key=activation_key
+        )
+
         return Response(
             UserCreatePublicSerializer(serializer.validated_data).data,
             status=status.HTTP_201_CREATED,
@@ -102,3 +118,31 @@ class UserDestroyAPI(generics.DestroyAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         return super().destroy(request, *args, **kwargs)
+
+
+class UserActivateAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        activation_key = request.data.get("activation_key")
+
+        try:
+            activation_keys = get_object_or_404(
+                ActivationKey, activation_key=activation_key
+            )
+        except:
+            return Response(
+                {"message": "Activation key not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        user = activation_keys.user
+        user.is_active = True
+        user.save()
+
+        activation_keys.delete()
+        send_confirmation_mail.delay(user.email)
+        return Response(
+            {"message": "User activated successfully"},
+            status=status.HTTP_200_OK,
+        )

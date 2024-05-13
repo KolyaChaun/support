@@ -8,7 +8,12 @@ from issues.api import (
     messages_api_dispatcher,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
-from users.api import UserCreateAPI, UserDestroyAPI, UserRetrieveUpdateAPI
+from users.api import (
+    UserActivateAPIView,
+    UserCreateAPI,
+    UserDestroyAPI,
+    UserRetrieveUpdateAPI,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -16,6 +21,7 @@ urlpatterns = [
     path("users/", UserCreateAPI.as_view()),
     path("users/<int:id>", UserRetrieveUpdateAPI.as_view()),
     path("users/delete/<int:id>", UserDestroyAPI.as_view()),
+    path("users/activate", UserActivateAPIView.as_view()),
     # issues
     path("issues/", IssuesAPI.as_view()),
     path("issues/<int:id>", IssuesRetrieveUpdateDeleteAPI.as_view()),
