@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     # Local domains
     "users",
     "issues",
+    "drf_yasg",
 ]
 
 THIRD_PARTY_APPS = [

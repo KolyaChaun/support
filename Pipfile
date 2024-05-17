@@ -13,6 +13,7 @@ psycopg = "*"
 psycopg2-binary = "*"
 celery = { version = "==5.4.0", extras = ["redis"] }
 redis = { version = "~=5.0", extras = ["hiredis"] }
+drf-yasg = "~=1.21"
 
 [dev-packages]
 isort = "*"
