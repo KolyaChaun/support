@@ -8,7 +8,7 @@ RUN apt-get update -y \
     && pip install --upgrade setuptools \
     && apt-get install -y build-essential \
     # install dependencies manager
-    && pip install pipenv \
+    && pip install pipenv watchdog \
     # cleaning up unused files
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,4 +28,4 @@ EXPOSE 8000
 # CMD sleep 2 && python src/manage.py runserver 0.0.0.0:8000
 
 ENTRYPOINT [ "python" ]
-CMD ["src/manage.py", "runserver"]
+CMD ["src/manage.py", "runserver", "0.0.0.0:8000"]

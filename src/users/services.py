@@ -1,13 +1,14 @@
+import json
 import uuid
 
-from django.shortcuts import get_object_or_404
+import redis
+from django.conf import settings
 
-from .models import ActivationKey, User
 from .tasks import send_activation_mail
 
 
 class Activator:
-    def __init__(self, email: str):
+    def __init__(self, email: str = None):
         self.email = email
 
     def create_activation_key(self) -> uuid.UUID:
@@ -29,8 +30,17 @@ class Activator:
     def save_activation_information(
         self, internal_user_id: int, activation_key: uuid.UUID
     ) -> None:
-        user = get_object_or_404(User, id=internal_user_id)
-        activation_key = ActivationKey(
-            user=user, activation_key=activation_key
+        connection_redis = redis.Redis.from_url(settings.CACHE_URL)
+        payload = {"user_id": internal_user_id}
+        connection_redis.set(
+            f"activation:{activation_key}", json.dumps(payload), ex=200
         )
-        activation_key.save()
+
+    def validate_activation(self, activation_key: uuid.UUID):
+        connection_redis = redis.Redis.from_url(settings.CACHE_URL)
+        cache_data = connection_redis.get(f"activation:{activation_key}")
+        if not cache_data:
+            return {"error": "Invalid or expired activation key."}
+
+        payload = json.loads(cache_data)
+        return payload
