@@ -1,12 +1,12 @@
+import redis
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from users.enums import Role
-from users.models import ActivationKey
 from users.tasks import send_confirmation_mail
 
 from .services import Activator
@@ -124,25 +124,24 @@ class UserActivateAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        activator_service = Activator()
         activation_key = request.data.get("activation_key")
 
-        try:
-            activation_keys = get_object_or_404(
-                ActivationKey, activation_key=activation_key
-            )
-        except:
+        validate_data = activator_service.validate_activation(activation_key)
+        if "error" in validate_data:
+            return Response(validate_data, status=status.HTTP_404_NOT_FOUND)
+        else:
+            internal_user_id = validate_data["user_id"]
+            user = User.objects.get(id=internal_user_id)
+            email = user.email
+            user.is_active = True
+            user.save()
+
+            connection_redis = redis.Redis.from_url(settings.CACHE_URL)
+            connection_redis.delete(f"activation:{activation_key}")
+
+            send_confirmation_mail.delay(email)
             return Response(
-                {"message": "Activation key not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                {"message": "User activated successfully"},
+                status=status.HTTP_200_OK,
             )
-
-        user = activation_keys.user
-        user.is_active = True
-        user.save()
-
-        activation_keys.delete()
-        send_confirmation_mail.delay(user.email)
-        return Response(
-            {"message": "User activated successfully"},
-            status=status.HTTP_200_OK,
-        )

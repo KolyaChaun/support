@@ -17,7 +17,7 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -152,7 +152,8 @@ SIMPLE_JWT = {
 
 APPEND_SLASH = False
 
-CELERY_BROKER_URL = os.getenv("REDIS_URL", default="redis://broker:6379/0")
+CELERY_BROKER_URL = os.getenv("BROKER_URL", default="redis://broker:6379/0")
+CACHE_URL = os.getenv("CACHE_URL", default="redis://cache:6379/0")
 
 # Mailhog
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
